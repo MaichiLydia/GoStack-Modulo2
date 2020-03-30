@@ -17,11 +17,12 @@
 - [Postbird](https://www.electronjs.org/apps/postbird)
 
 #### Sumário
--[Configurando estrutura](#configurando-estrutura)
--[Nodemon e Sucrase](#nodemon-e-sucrase)
--[Configurando debugger](#configurando-debugger)
--[Conceitos de Docker](#conceitos-de-docker)
--[Configurando docker](#configurando-docker)
+- [Configurando estrutura](#configurando-estrutura)
+- [Nodemon e Sucrase](#nodemon-e-sucrase)
+- [Configurando debugger](#configurando-debugger)
+- [Conceitos de Docker](#conceitos-de-docker)
+- [Configurando docker](#configurando-docker)
+- [Conceitos ORM e Sequelize](#conceitos-orm-e-sequelize)
 
 
 #### Configurando estrutura
@@ -149,3 +150,33 @@ docker logs database
 ```
 
 Também é possível utilizar esse mesmo container para outras aplicações, mas o ideal é que seja isolado e especifico para cada aplicação e veremos isso em outra aula.
+
+#### Conceitos ORM e Sequelize
+##### ORM - Object Relational Mapping
+- Abstração do banco de dados - mudando a comunicação com o banco
+- Tabelas viram models
+- A manipulação dos dados ficam sem queries SQL, no caso da nossa aplicação utilizaremos apenas código javascript para que isso aconteça.
+##### Migrations
+- Controle de versão para base de dados, para que a base esteja sempre atualizada entre todos os envolvidos no projeto e no ambiente de produção. 
+- Cada arquivo contém instruções para criação, alteração ou remoção de tabelas ou colunas e a ordenação ocorre por data.
+- É possível desfazer uma migração se errarmos algo enquanto estivermos desenvolvendo a feature
+- **Não** é possível editar a migration após implementada para outras pessoas e/ou ambientes.
+- Cada migration deve realizar alterações em apenas uma tabela, é possível criar várias migrations para alterações maiores.
+
+##### Seeds
+- arquivos que populam a base de dados para desenvolvimento
+- Muito utilizados para testes
+- Execuutável apenas por código
+- Jamais utilizado em produção
+- Caso sejam dados que precisam ir para produção, a própria migration pode manipular dados das tabelas
+
+##### Arquitetura MVC - Model, View, Controller
+- Model: ele abstrai as figuras principais da aplicação, nesse tutorial utilizaremos para abstração do banco, utilizado para manipular os dandos contidos nas tabelas e não possuem responsabilidades sobre a regra de negócio da nossa aplicação.
+- Controller: é o ponto de entrada das requisições da nossa aplicação, uma rota geralmente está associada diretamente com um método do controller. Podemos incluir a grande parte das regras de negócio da aplicação nos controllers(conforme a aplicação cresce podemos isolar as regras).
+    - Classes
+    - Sempre retorna um JSON
+    - Não chama outro controller/método
+    - Quando criar um controller:
+      - Toda vez que tiver uma nova entidade
+      - Apenas 5 métodos;
+- View: é o retorno ao cliente, em aplicações que não utilizam o modelo de API REST o retorno pode ser um HTML ou txt, mas no nosso caso a view é apenas nosso JSON que será retornado ao front-end e depois manipulado pelo ReactJS ou React Native.
