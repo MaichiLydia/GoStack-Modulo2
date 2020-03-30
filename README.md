@@ -13,16 +13,15 @@
 - [HTTP Métodos](https://www.w3schools.com/tags/ref_httpmethods.asp)
 - [API REST](https://becode.com.br/o-que-e-api-rest-e-restful/)
 - [express getting started](https://expressjs.com/en/starter/installing.html) e [express reference](https://expressjs.com/en/4x/api.html)
-
+- [Docker get started](https://www.docker.com/get-started) e [Docker documentação](https://docs.docker.com/)
+- [Postbird](https://www.electronjs.org/apps/postbird)
 
 #### Sumário
-[Configurando estrutura](#configurando-estrutura)
-[Nodemon e Sucrase](#nodemon-e-sucrase)
-[Configurando debugger](#configurando-debugger)
-
-
-
-
+-[Configurando estrutura](#configurando-estrutura)
+-[Nodemon e Sucrase](#nodemon-e-sucrase)
+-[Configurando debugger](#configurando-debugger)
+-[Conceitos de Docker](#conceitos-de-docker)
+-[Configurando docker](#configurando-docker)
 
 
 #### Configurando estrutura
@@ -105,3 +104,48 @@ Para configurar o debugger, será necessário mudar no launch.json o request e o
  E também adicionar ao `scripts`:
 `"dev:debug": "nodemon --inspect src/server.js"`
 isso faz com que nossa configuração do nodemon pegue para o debugger também.
+
+#### Conceitos de Docker
+ Controlar serviços da aplicação - banco de dados, envio de email, etc
+##### Como funciona ? 
+ - Criação de ambientes isolados(container) -> Para que a configuração e pastas não criem dependencias ou conflitos na nossa máquina, isolamos esse serviço num ambiente e tornamos a exclusão, atualização ou até mesmo a substituição mais simples.
+ - Containers expõem portas para comunicação.
+
+##### Principais conceitos: 
+- Imagem: Serviços/ferramentas disponíveis para utilização
+- Container: instância de uma imagem.
+- Docker Registry (Docker Hub) -> onde encontrar as imagens
+- Dockerfile - Receita para criar uma imagem.
+
+#### Configurando Docker
+Para configurar o docker será necessário seguir as instruções do site: https://www.docker.com/get-started conforme o seu sistema operacional, após instalado é possível verificar se tudo deu certo com os seguintes comandos: `docker --version` e `docker help`
+
+Utilizamos o docker com a imagem do postgres: https://hub.docker.com/_/postgres
+
+`docker run --name dabase -e POSTGRES_PASSWORD=qualquer -p 5432:5432 -d postgres`
+--name ${nome}: para o nome da sua aplicação
+-e: para variaveis, podemos ver mais opções no link da imagem, exemplo: POSTGRES_PASSWORD=${senha}
+-p ${Porta na sua maquina}:${Porta na imagem do docker} - redirecionamento de porta
+-d ${nome da imagem no docker hub} - para passar qual imagem queremos
+Ao terminar de executar o docker retorna um id único do container e podemos utilizá-lo para testar se tudo funcionou corretamente:
+`docker ps`
+E verificar se o id gerado está na tabela q o `docker ps` printou no console.
+
+Para visualizarmos o nosso banco, é possível baixar um client de postgres, nesse curso utilizamos o [postbird](https://www.electronjs.org/apps/postbird)
+
+Deixando as configuraçoes assim:
+![Configurações do postbird - host: localhost - port: porta que foi escolhida na hora do comando docker run - username: postgres - password: senha que foi escolhida na hora do comando docker run ](README_FILES/postbird/connect.png)
+
+E criamos um novo database já utilizando o postbird:
+![Selecionar 'create database' no canto esquerdo superior, em 'select databse' e colocar como nome 'gobarber', deixar template em branco e selecionar no encoding UTF8](README_FILES/postbird/database_create.png)
+
+Para garantirmos que a mesma instancia do banco de dados seja iniciada corretamente, mesmo quando reiniciarmos nossa máquina ou parar esse container com `docker stop database` podemos utilizar o id único ou o nome no comando `docker start`, por exemplo: 
+```
+docker start database
+```
+Caso de algum erro é possível veriricar os logs: 
+``` 
+docker logs database
+```
+
+Também é possível utilizar esse mesmo container para outras aplicações, mas o ideal é que seja isolado e especifico para cada aplicação e veremos isso em outra aula.
