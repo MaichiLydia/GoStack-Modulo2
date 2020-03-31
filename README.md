@@ -213,3 +213,21 @@ instalar `yarn add pg pg-hstore` e adicionar as configurações em [database.js]
 
 #### Aula2
 > Cadastro e autenticação de usuários
+
+#### Sumário
+- [Migration de usuário](#migration-de-usuário)
+
+
+#### Migration de usuário
+
+Começamos com `yarn sequelize migration:create --name=create-users` que gerará um arquivo na pasta `src/database/migrations`, nesse arquivo gerado(que nesse projeto foi [esse](src/database/migrations/20200331034210-create-users.js)) escolheremos os campos necessários pra um usuário, quando terminado testaremos com o comando: `yarn sequelize db:migrate`.
+
+E ficarará assim no postbird:
+
+![No postbird após dar refresh conseguimos ver a tabela users criadas com todos os campos configurados no arquivo gerado no migrations](README_FILES/postbird/users_created.png)
+
+Esse migrate também gerará uma tabela chamada `SequelizeMeta`, ela serve para armazenar todas as migrations que esse banco já recebeu para poder checar a necessidade de atualizações/criações/exclusões sempre que receber um migrate novo, por isso o migrate sempre sabe quando e o que atualizar.
+
+Caso a migrate que eu fiz teve algum erro antes de eu enviar para outros desenvolvedores ou antes de ir para produção, é possível executar `yarn sequelize db:migrate:undo:all` para desfazer todas as migrations sem o `:all` para desfazer a última.
+
+Executando isso conseguimos ver que a tabela de `users` some e o registro na tabela `SequelizeMeta` também some.
