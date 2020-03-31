@@ -166,7 +166,7 @@ Também é possível utilizar esse mesmo container para outras aplicações, mas
 ##### Seeds
 - arquivos que populam a base de dados para desenvolvimento
 - Muito utilizados para testes
-- Execuutável apenas por código
+- Executável apenas por código
 - Jamais utilizado em produção
 - Caso sejam dados que precisam ir para produção, a própria migration pode manipular dados das tabelas
 
