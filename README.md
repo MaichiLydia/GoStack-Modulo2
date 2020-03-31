@@ -218,6 +218,7 @@ instalar `yarn add pg pg-hstore` e adicionar as configurações em [database.js]
 - [Migration de usuário](#migration-de-usuário)
 - [Model de usuário](#model-de-usuário)
 - [Criando loader de models](#criando-loader-de-models)
+- [Cadastro de usuários](#cadastro-de-usuários)
 
 
 #### Migration de usuário
@@ -268,3 +269,81 @@ E também coseguimos visualizar a criação no postbird:
 
 E como estamos em modo de desenvolvimento também é retornado no log a query de inserção sem valores:
 ![Aqui aparece o log com a query de inserção: Executing (default): INSERT INTO "users" ("id","name","email","password_hash","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5) RETURNING *;](README_FILES/images/postbird/sequelize_log.png)
+
+#### Cadastro de usuários
+Para efetuarmos um cadastro recebendo de fato as informações de uma chamada com metodo POST criamos o arquivo [UserController](src/app/controllers/UserController.js) e nele fazemos a inserção:
+```
+const { id, name, email, provider } = await User.create(req.body);
+```
+Pegando apenas as informações desejadas para mostrar ao usuário:
+```
+return res.json({
+    id,
+    name,
+    email,
+    provider,
+});
+```
+E como colocamos o email como único, devemos checar se já existe algum registro com essa informação e retornar o erro para o usuário, para isso fizemos essa checagem antes da inserção:
+```
+const userExists = await User.findOne({
+    where: { email: req.body.email },
+});
+if (userExists) {
+    return res.status(400).json({ error: 'User already exists.' });
+}
+```
+
+Para testarmos conseguimos utilizar a [essa collection do insomnia](README_FILES/insomnia/GoBarber_Users.json),
+antes de fazer a chamada configuramos a `base_url` em No Environment > Manage Environment > Base Environment:
+```
+{
+  "base_url": "http://localhost:3333"
+}
+```
+Caso não consiga importar a collection também é possível utilizar o cUrl
+
+Um exemplo de sucesso é:
+
+**Request**:
+```
+curl --request POST \
+  --url http://localhost:3333/users \
+  --header 'content-type: application/json' \
+  --data '{
+	"name": "Lydia Rodrigues da Silva",
+	"email": "mlydiarodrigues3@gmail.com",
+	"password_hash":"21321321321"
+}'
+```
+**Response**:
+```
+{
+  "id": 3,
+  "name": "Lydia Rodrigues da Silva",
+  "email": "mlydiarodrigues3@gmail.com",
+  "provider": false
+}
+```
+E um de erro:
+
+**Request**:
+```
+curl --request POST \
+  --url http://localhost:3333/users \
+  --header 'content-type: application/json' \
+  --data '{
+	"name": "Lydia Rodrigues da Silva",
+	"email": "mlydiarodrigues@gmail.com",
+	"password_hash":"21321321321"
+}'
+```
+**Response**:
+}
+```
+{
+  "error": "User already exists."
+}
+```
+
+
