@@ -371,6 +371,28 @@ this.addHook('beforeSave', async (user) => {
     }
 });
 ```
+E agora para criar um usuario a requisição fica assim:
+```
+curl --request POST \
+  --url http://localhost:3333/users \
+  --header 'content-type: application/json' \
+  --data '{
+	"name": "Lydia Rodrigues da Silva",
+	"email": "mlydiarodrigues4@gmail.com",
+	"password":"21321321321"
+}'
+```
+Response continua o mesmo:
+```
+{
+  "id": 4,
+  "name": "Lydia Rodrigues da Silva",
+  "email": "mlydiarodrigues4@gmail.com",
+  "provider": false
+}
+```
+E no postbird conseguimos ver a senha criptografada:
+![Na imagem é possível visualizar as informações do usuário inserido e no campo password_hash a senha criptografada, que fica assim: $2a$08$0m6tDCLgrCpk7kyGWE4OGexOZ9m3iKd1hdAhW/OzOqxk81Sn7KKwm](README_FILES/images/postbird/password_hashed.png)
 #### Conceitos JWT
 **JWT** - **J**son **W**eb **T**oken - token no formato de json
 Utilizamos em autenticação, pois ao passarmos o usuario e senha corretos, conseguimos gerar um token com informações criptografadas e uteis para verificação de acessos e outras utilidades.
