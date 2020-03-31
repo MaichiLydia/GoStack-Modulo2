@@ -216,6 +216,7 @@ instalar `yarn add pg pg-hstore` e adicionar as configurações em [database.js]
 
 #### Sumário
 - [Migration de usuário](#migration-de-usuário)
+- [Model de usuário](#model-de-usuário)
 
 
 #### Migration de usuário
@@ -231,3 +232,7 @@ Esse migrate também gerará uma tabela chamada `SequelizeMeta`, ela serve para 
 Caso a migrate que eu fiz teve algum erro antes de eu enviar para outros desenvolvedores ou antes de ir para produção, é possível executar `yarn sequelize db:migrate:undo:all` para desfazer todas as migrations sem o `:all` para desfazer a última.
 
 Executando isso conseguimos ver que a tabela de `users` some e o registro na tabela `SequelizeMeta` também some.
+
+#### Model de usuário
+
+Criamos a model de [User](src/app/models/User.js) passando todas as informações que podem ser recebidas na criação de um usuário, tirando as informações que já são populadas automaticamente como chaves primárias e datas de criação e edição.
