@@ -219,6 +219,7 @@ instalar `yarn add pg pg-hstore` e adicionar as configurações em [database.js]
 - [Model de usuário](#model-de-usuário)
 - [Criando loader de models](#criando-loader-de-models)
 - [Cadastro de usuários](#cadastro-de-usuários)
+- [Gerando hash da senha](#gerando-hash-da-senha)
 
 
 #### Migration de usuário
@@ -339,11 +340,20 @@ curl --request POST \
 }'
 ```
 **Response**:
-}
 ```
 {
   "error": "User already exists."
 }
 ```
+#### Gerando hash da senha
+Para gerar o hash da senha utilizaremos a extensão bcryptjs
+```
+yarn add bcryptjs
+```
+E depois devemos passar a receber o password, para isso atualizamos no [model](src/models/User.js):
+```
+password: Sequelize.VIRTUAL,
+```
+Utilizamos o `VIRTUAL` para que esse campo não exista no banco, somente do lado do código.
 
-
+E utilizaremos um `hook`, funcionalidade do sequelize, que é um trecho de código que é executado de forma automatica depois de alguma ação que acontece no nosso model, como um gatilho, nesse caso o gatilho será a inserção de um novo usuário, porém faremos algo antes disso acontecer, por isso o `beforeSave`.
