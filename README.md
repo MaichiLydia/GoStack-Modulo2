@@ -7,15 +7,18 @@
 
 #### Requisitos
 
+Instação
 - [Vscode](https://code.visualstudio.com/Download)
 - [node download](https://nodejs.org/en/download/) e [node documentação](https://nodejs.org/en/docs/)
 - [yarn](https://yarnpkg.com/)
-- [HTTP Métodos](https://www.w3schools.com/tags/ref_httpmethods.asp)
-- [API REST](https://becode.com.br/o-que-e-api-rest-e-restful/)
 - [express getting started](https://expressjs.com/en/starter/installing.html) e [express reference](https://expressjs.com/en/4x/api.html)
 - [Docker get started](https://www.docker.com/get-started) e [Docker documentação](https://docs.docker.com/)
 - [Postbird](https://www.electronjs.org/apps/postbird)
-- ESLint, Prettier e EditorConfig
+
+- Conceituais
+    - [HTTP Métodos](https://www.w3schools.com/tags/ref_httpmethods.asp)
+    - [API REST](https://becode.com.br/o-que-e-api-rest-e-restful/)
+    - [JWT](https://jwt.io/introduction/)
 
 #### Índice das aulas:
 - [Aula1 - Ambiente e conceitos](#aula1)
@@ -220,6 +223,7 @@ instalar `yarn add pg pg-hstore` e adicionar as configurações em [database.js]
 - [Criando loader de models](#criando-loader-de-models)
 - [Cadastro de usuários](#cadastro-de-usuários)
 - [Gerando hash da senha](#gerando-hash-da-senha)
+- [Conceitos de JWT](#conceitos-jwt)
 
 
 #### Migration de usuário
@@ -366,3 +370,10 @@ this.addHook('beforeSave', async (user) => {
     }
 });
 ```
+#### Conceitos JWT
+**JWT** - **J**son **W**eb **T**oken - token no formato de json
+Utilizamos em autenticação, pois ao passarmos o usuario e senha corretos, conseguimos gerar um token com informações criptografadas e uteis para verificação de acessos e outras utilidades.
+![Imagem explicando cada parte de um token jwt, ele tem as informações de header, com o tipo de token e algoritmo, payload com dados não sensiveis como email ou id, e a assinatura](https://miro.medium.com/max/1400/1*0SEbHdFcVpaejejGA-1DDw.png)
+
+[Imagem retirada desse post](https://codeburst.io/jwt-to-authenticate-servers-apis-c6e179aa8c4e)
+
