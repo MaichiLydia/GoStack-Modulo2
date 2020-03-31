@@ -16,6 +16,14 @@
 - [Docker get started](https://www.docker.com/get-started) e [Docker documentação](https://docs.docker.com/)
 - [Postbird](https://www.electronjs.org/apps/postbird)
 - ESLint, Prettier e EditorConfig
+
+#### Índice das aulas:
+- [Aula1 - Ambiente e conceitos](#aula1)
+- [Aula2 - Cadastro e autenticação de usuários](#aula2)
+
+#### Aula1
+> Ambiente e conceitos
+
 #### Sumário
 - [Configurando estrutura](#configurando-estrutura)
 - [Nodemon e Sucrase](#nodemon-e-sucrase)
@@ -166,7 +174,7 @@ Também é possível utilizar esse mesmo container para outras aplicações, mas
 ##### Seeds
 - arquivos que populam a base de dados para desenvolvimento
 - Muito utilizados para testes
-- Execuutável apenas por código
+- Executável apenas por código
 - Jamais utilizado em produção
 - Caso sejam dados que precisam ir para produção, a própria migration pode manipular dados das tabelas
 
@@ -202,3 +210,6 @@ Após isso será necessário criar na raiz do projeto um arquivo `.sequelicerc` 
 instalar `yarn add pg pg-hstore` e adicionar as configurações em [database.js](src/config/database.js), aqui ficaram as informações para conexão no postgres e as definições necessárias, como:
 - `timestamps` para adicionar `created_at` e `updated_at` nas tabelas e conseguirmos verificar datas de criação e edição.
 - `underscored` e `underscoredAll` para padronizar a nomenclatura para _ e não camelCase, exemplo: userGroups ficariaw user_groups
+
+#### Aula2
+> Cadastro e autenticação de usuários
