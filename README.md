@@ -15,7 +15,7 @@
 - [express getting started](https://expressjs.com/en/starter/installing.html) e [express reference](https://expressjs.com/en/4x/api.html)
 - [Docker get started](https://www.docker.com/get-started) e [Docker documentação](https://docs.docker.com/)
 - [Postbird](https://www.electronjs.org/apps/postbird)
-
+- ESLint, Prettier e EditorConfig
 #### Sumário
 - [Configurando estrutura](#configurando-estrutura)
 - [Nodemon e Sucrase](#nodemon-e-sucrase)
@@ -23,8 +23,7 @@
 - [Conceitos de Docker](#conceitos-de-docker)
 - [Configurando docker](#configurando-docker)
 - [Conceitos ORM e Sequelize](#conceitos-orm-e-sequelize)
-- [ESLint Prettier EditorConfig](#eslint-prettier-editorconfig)
-
+- [Configurando Sequelize](#configurando-sequelize)
 
 #### Configurando estrutura
 Começamos esse módulo criando a pasta e inicializando um projeto com yarn, logo após instalando o express
@@ -50,7 +49,7 @@ para:
 
 `import { Router } from 'express';`
 
-E também: 
+E também:
 
 `module.exports = routes;`
 
@@ -60,10 +59,10 @@ para:
 
 e com isso mudaremos em todos os arquivos, `app.js` e `server.js`.
 
-Se a gente tentar rodar a aplicação passando: 
+Se a gente tentar rodar a aplicação passando:
 `node src/server.js`
 
-dará erro, para que dê certo devemos utilizar: 
+dará erro, para que dê certo devemos utilizar:
 `yarn sucrase-node src/server.js`
 
 Para que o comando fique fácil e não necessite reinicializar após cada modificação, utilizamos o `nodemon`, adicionamos a seção de `scripts` no `package.json`:
@@ -72,7 +71,7 @@ Para que o comando fique fácil e não necessite reinicializar após cada modifi
     "dev": "nodemon src/server.js"
   },
 ```
-e é necessário configurar o nodemon para que ele execute o sucrase antes, criando um arquivo `nodemon.json` na raiz do projeto e passando as informações necessárias: 
+e é necessário configurar o nodemon para que ele execute o sucrase antes, criando um arquivo `nodemon.json` na raiz do projeto e passando as informações necessárias:
 ```
 {
     "execMap": {
@@ -109,11 +108,11 @@ isso faz com que nossa configuração do nodemon pegue para o debugger também.
 
 #### Conceitos de Docker
  Controlar serviços da aplicação - banco de dados, envio de email, etc
-##### Como funciona ? 
+##### Como funciona ?
  - Criação de ambientes isolados(container) -> Para que a configuração e pastas não criem dependencias ou conflitos na nossa máquina, isolamos esse serviço num ambiente e tornamos a exclusão, atualização ou até mesmo a substituição mais simples.
  - Containers expõem portas para comunicação.
 
-##### Principais conceitos: 
+##### Principais conceitos:
 - Imagem: Serviços/ferramentas disponíveis para utilização
 - Container: instância de uma imagem.
 - Docker Registry (Docker Hub) -> onde encontrar as imagens
@@ -141,12 +140,12 @@ Deixando as configuraçoes assim:
 E criamos um novo database já utilizando o postbird:
 ![Selecionar 'create database' no canto esquerdo superior, em 'select databse' e colocar como nome 'gobarber', deixar template em branco e selecionar no encoding UTF8](README_FILES/postbird/database_create.png)
 
-Para garantirmos que a mesma instancia do banco de dados seja iniciada corretamente, mesmo quando reiniciarmos nossa máquina ou parar esse container com `docker stop database` podemos utilizar o id único ou o nome no comando `docker start`, por exemplo: 
+Para garantirmos que a mesma instancia do banco de dados seja iniciada corretamente, mesmo quando reiniciarmos nossa máquina ou parar esse container com `docker stop database` podemos utilizar o id único ou o nome no comando `docker start`, por exemplo:
 ```
 docker start database
 ```
-Caso de algum erro é possível veriricar os logs: 
-``` 
+Caso de algum erro é possível veriricar os logs:
+```
 docker logs database
 ```
 
@@ -158,7 +157,7 @@ Também é possível utilizar esse mesmo container para outras aplicações, mas
 - Tabelas viram models
 - A manipulação dos dados ficam sem queries SQL, no caso da nossa aplicação utilizaremos apenas código javascript para que isso aconteça.
 ##### Migrations
-- Controle de versão para base de dados, para que a base esteja sempre atualizada entre todos os envolvidos no projeto e no ambiente de produção. 
+- Controle de versão para base de dados, para que a base esteja sempre atualizada entre todos os envolvidos no projeto e no ambiente de produção.
 - Cada arquivo contém instruções para criação, alteração ou remoção de tabelas ou colunas e a ordenação ocorre por data.
 - É possível desfazer uma migração se errarmos algo enquanto estivermos desenvolvendo a feature
 - **Não** é possível editar a migration após implementada para outras pessoas e/ou ambientes.
@@ -181,3 +180,25 @@ Também é possível utilizar esse mesmo container para outras aplicações, mas
       - Toda vez que tiver uma nova entidade
       - Apenas 5 métodos;
 - View: é o retorno ao cliente, em aplicações que não utilizam o modelo de API REST o retorno pode ser um HTML ou txt, mas no nosso caso a view é apenas nosso JSON que será retornado ao front-end e depois manipulado pelo ReactJS ou React Native.
+
+#### Configurando Sequelize
+Para começar, criaremos algumas pastas
+
+```
+src
+└───app
+│   └───controllers
+│   └───models
+└───config
+│   │   database.js
+└───database
+│   └───migrations
+
+```
+e depois rodamos `yarn add sequelize` e `yarn add sequelize-cli -D` para facilitar migrations e outros comandos por linha no nosso console
+
+Após isso será necessário criar na raiz do projeto um arquivo `.sequelicerc` e colocar as configurações especificas, para ver [clique aqui](.sequelizerc)
+
+instalar `yarn add pg pg-hstore` e adicionar as configurações em [database.js](src/config/database.js), aqui ficaram as informações para conexão no postgres e as definições necessárias, como:
+- `timestamps` para adicionar `created_at` e `updated_at` nas tabelas e conseguirmos verificar datas de criação e edição.
+- `underscored` e `underscoredAll` para padronizar a nomenclatura para _ e não camelCase, exemplo: userGroups ficariaw user_groups
