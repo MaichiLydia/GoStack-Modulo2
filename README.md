@@ -143,10 +143,10 @@ E verificar se o id gerado está na tabela q o `docker ps` printou no console.
 Para visualizarmos o nosso banco, é possível baixar um client de postgres, nesse curso utilizamos o [postbird](https://www.electronjs.org/apps/postbird)
 
 Deixando as configuraçoes assim:
-![Configurações do postbird - host: localhost - port: porta que foi escolhida na hora do comando docker run - username: postgres - password: senha que foi escolhida na hora do comando docker run ](README_FILES/postbird/connect.png)
+![Configurações do postbird - host: localhost - port: porta que foi escolhida na hora do comando docker run - username: postgres - password: senha que foi escolhida na hora do comando docker run ](README_FILES/images/postbird/connect.png)
 
 E criamos um novo database já utilizando o postbird:
-![Selecionar 'create database' no canto esquerdo superior, em 'select databse' e colocar como nome 'gobarber', deixar template em branco e selecionar no encoding UTF8](README_FILES/postbird/database_create.png)
+![Selecionar 'create database' no canto esquerdo superior, em 'select databse' e colocar como nome 'gobarber', deixar template em branco e selecionar no encoding UTF8](README_FILES/images/postbird/database_create.png)
 
 Para garantirmos que a mesma instancia do banco de dados seja iniciada corretamente, mesmo quando reiniciarmos nossa máquina ou parar esse container com `docker stop database` podemos utilizar o id único ou o nome no comando `docker start`, por exemplo:
 ```
@@ -217,6 +217,7 @@ instalar `yarn add pg pg-hstore` e adicionar as configurações em [database.js]
 #### Sumário
 - [Migration de usuário](#migration-de-usuário)
 - [Model de usuário](#model-de-usuário)
+- [Criando loader de models](#criando-loader-de-models)
 
 
 #### Migration de usuário
@@ -225,7 +226,7 @@ Começamos com `yarn sequelize migration:create --name=create-users` que gerará
 
 E ficarará assim no postbird:
 
-![No postbird após dar refresh conseguimos ver a tabela users criadas com todos os campos configurados no arquivo gerado no migrations](README_FILES/postbird/users_created.png)
+![No postbird após dar refresh conseguimos ver a tabela users criadas com todos os campos configurados no arquivo gerado no migrations](README_FILES/images/postbird/users_created.png)
 
 Esse migrate também gerará uma tabela chamada `SequelizeMeta`, ela serve para armazenar todas as migrations que esse banco já recebeu para poder checar a necessidade de atualizações/criações/exclusões sempre que receber um migrate novo, por isso o migrate sempre sabe quando e o que atualizar.
 
@@ -236,3 +237,34 @@ Executando isso conseguimos ver que a tabela de `users` some e o registro na tab
 #### Model de usuário
 
 Criamos a model de [User](src/app/models/User.js) passando todas as informações que podem ser recebidas na criação de um usuário, tirando as informações que já são populadas automaticamente como chaves primárias e datas de criação e edição.
+
+#### Criando loader de models
+O arquivo [index.js](src/database/index.js) para que realize a conexão com o banco de dados postgres e carregue todos os nossos models. O método `init` fará tudo isso:
+
+- A variável `this.connection` no método `init` do nosso arquivo `index.js` é o parametro esperado nos models em seus próprios metodos init, então acessaremos cada model, acessando também seus métodos e passando esse valor, que é o que é feito nesse trecho de código:
+```
+models.map((model) => model.init(this.connection));
+```
+E chamamos esse arquivo no [app.js](src/app.js)
+
+**Somente para testar** podemos no arquivo [routes.js](src/routes.js) inserir um usuário direto na rota '/' no método GET:
+```
+routes.get('/', async (req, res) => {
+    const user = await User.create({
+        name: 'Lydia Rodrigues',
+        email: 'mlydiarodrigues@gmail.com',
+        password_hash: '123457567',
+    });
+    return res.json(user);
+});
+```
+E assim ao acessar nossa aplicação conseguimos ver o todos os campos que são gerados automaticamente quando o registro é salvo no banco com informações e também as informações que colocamos para criar o usuário:
+
+![Aqui conseguimos ver a tela com as informações do usuário criado, com os campos que foram preenchidos antes e o adicional de id: 1, updatedAt: "2020-03-31T04:30:12.401Z", createdAt: "2020-03-31T04:30:12.401Z", provider: false](README_FILES/images/response/user_created.png)
+
+E também coseguimos visualizar a criação no postbird:
+![A tela do postbird com as mesmas informações mencionadas na imagem de cima porém na tabela de users](README_FILES/images/postbird/user_created.png)
+
+
+E como estamos em modo de desenvolvimento também é retornado no log a query de inserção sem valores:
+![Aqui aparece o log com a query de inserção: Executing (default): INSERT INTO "users" ("id","name","email","password_hash","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5) RETURNING *;](README_FILES/images/postbird/sequelize_log.png)
