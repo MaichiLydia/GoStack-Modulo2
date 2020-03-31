@@ -357,3 +357,12 @@ password: Sequelize.VIRTUAL,
 Utilizamos o `VIRTUAL` para que esse campo não exista no banco, somente do lado do código.
 
 E utilizaremos um `hook`, funcionalidade do sequelize, que é um trecho de código que é executado de forma automatica depois de alguma ação que acontece no nosso model, como um gatilho, nesse caso o gatilho será a inserção de um novo usuário, porém faremos algo antes disso acontecer, por isso o `beforeSave`.
+
+Esse hook fara a criptografia da senha do usuário, fazendo com que a gente não salve a senha de fato e torne a aplicação mais segura:
+```
+this.addHook('beforeSave', async (user) => {
+    if (user.password) {
+        user.password_hash = await bcrypt.hash(user.password, 8);
+    }
+});
+```
