@@ -224,6 +224,7 @@ instalar `yarn add pg pg-hstore` e adicionar as configurações em [database.js]
 - [Cadastro de usuários](#cadastro-de-usuários)
 - [Gerando hash da senha](#gerando-hash-da-senha)
 - [Conceitos de JWT](#conceitos-jwt)
+- [Autenticação JWT](#autenticacao-jwt)
 
 
 #### Migration de usuário
@@ -377,3 +378,82 @@ Utilizamos em autenticação, pois ao passarmos o usuario e senha corretos, cons
 
 [Imagem retirada desse post](https://codeburst.io/jwt-to-authenticate-servers-apis-c6e179aa8c4e)
 
+#### Autenticação JWT
+Criamos um [SessionController](src/app/controllers/SessionController.js), não faremos na UserController porque por mais que uma sessão seja relacionada com o usuário, ela tem caracteristicas diferentes e é complexa, podendo então tratar como uma entidade diferente de usuário.
+
+Para gerar o token, utilizamos a extensão jsonerbtoken:
+```
+yarn add jsonwebtoken
+```
+
+E no nosso arquivo [SessionController](src/app/controllers/SessionController.js) após fazer todas as verificações de usuário necessárias, finalmente criamos o token:
+```
+token: jwt.sign({ id }, '3a3d6bc75757af03fd7aa45d90a8aab4', { expiresIn: '7d' })
+```
+Passando:
+- primeiro parametro o payload, que é a informação sensível que poderemos reutilizar em outras chamadas.
+- segundo é um texto seguro que apenas nós teremos acesso, é possível gerar um token no site https://www.md5online.org/ e passando alguma frase segura que dificilmente alguém saberia como por exemplo: gobarbergostackbackend
+- terceiro são configurações adicionais como data de expiração
+
+Para que essas informações fiquem mais seguras e concetradas em apenas um local, criamos o arquivo de [config da autenticação](src/config/auth.js) e exportamos na nossa [SessionController](src/app/controllers/SessionController.js)
+
+
+Para testarmos conseguimos utilizar a [essa collection do insomnia](README_FILES/insomnia/GoBarber_Session.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](#cadastro-de-usuários)
+
+Caso não consiga importar a collection também é possível utilizar o cUrl
+
+Um exemplo de sucesso é:
+
+**Request**:
+```
+curl --request POST \
+  --url http://localhost:3333/sessions \
+  --header 'content-type: application/json' \
+  --data '{
+	"email": "mlydiarodrigues7@gmail.com",
+	"password":"123456"
+}'
+```
+**Response**:
+```
+{
+  "user": {
+    "id": 5,
+    "email": "mlydiarodrigues7@gmail.com"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNTg1NjM1MDU0LCJleHAiOjE1ODYyMzk4NTR9.ljR-qC3R6AjOR2CwEIZppfJKzGgByHr0ARlAHk8MViw"
+}
+```
+Um de erro com email errado:
+
+**Request**:
+```
+curl --request POST \
+  --url http://localhost:3333/sessions \
+  --header 'content-type: application/json' \
+  --data '{
+	"email": "emailestranho@gmail.com",
+	"password":"123456"
+}'
+```
+**Response**:
+```
+{
+  "error": "User not found"
+}
+```
+Um de erro com senha incorreta:
+
+**Request**:
+```
+{
+	"email": "mlydiarodrigues7@gmail.com",
+	"password":"12345622"
+}
+```
+**Response**:
+```
+{
+  "error": "User not allowed, please verify email/password"
+}
+```
