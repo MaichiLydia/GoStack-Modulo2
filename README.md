@@ -23,6 +23,7 @@
 - [Conceitos de Docker](#conceitos-de-docker)
 - [Configurando docker](#configurando-docker)
 - [Conceitos ORM e Sequelize](#conceitos-orm-e-sequelize)
+- [ESLint Prettier EditorConfig](#eslint-prettier-editorconfig)
 
 
 #### Configurando estrutura
