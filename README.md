@@ -224,7 +224,8 @@ instalar `yarn add pg pg-hstore` e adicionar as configurações em [database.js]
 - [Cadastro de usuários](#cadastro-de-usuários)
 - [Gerando hash da senha](#gerando-hash-da-senha)
 - [Conceitos de JWT](#conceitos-jwt)
-- [Autenticação JWT](#autenticacao-jwt)
+- [Autenticação JWT](#autenticação-jwt)
+- [Middleware de autenticação](#middleware-de-autenticação)
 
 
 #### Migration de usuário
@@ -479,3 +480,22 @@ Um de erro com senha incorreta:
   "error": "User not allowed, please verify email/password"
 }
 ```
+#### Middleware de autenticação
+Na seção anterior conseguimos gerar o token retornado quando o usuário loga, agora a gente precisa fazer com que esse token seja solicitado nas rotas necessárias, passaremos essa informação nos Headers dessas chamadas com o par chave:valor `Authorization: Bearer ${token gerado}`(no insomnia também conseguimos colocar o token sem a palavra `Bearer` indo em Auth > Bearer Token > e adicionando o valor no campo Token), mas antes criamos um [middleware de autenticação](src/app/middlewares/auth.js):
+
+- Aqui utilizamos promisify, que pega uma função de callback e transforma em uma promise de async await, fizemos isso pois o jwt verify utiliza função de callback, porém esse projeto tem como padronização utilizar async / await.
+
+Para utilizar middleware de autenticação, importamos nas [rotas](src/routes.js) e conseguimos utilizar da segunte forma:
+```
+routes.post('/users', UserController.store);
+routes.post('/sessions', SessionController.store);
+
+routes.use(authMiddleware);
+
+routes.put('/users', UserController.update);
+```
+Quando a gente utiliza o routes.use ele só passa a funcionar nas rotas abaixo dele, então essa autenticação só será chamada nas rotas necessárias, nesse caso, a rota de atualização.
+
+Para testarmos conseguimos utilizar a [essa collection do insomnia](README_FILES/insomnia/GoBarber_Update.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](#cadastro-de-usuários)
+
+Colocarei o curl dessas chamadas na próxima parte pois também trabalharemos nessa chamada.
