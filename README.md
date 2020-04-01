@@ -226,6 +226,8 @@ instalar `yarn add pg pg-hstore` e adicionar as configurações em [database.js]
 - [Conceitos de JWT](#conceitos-jwt)
 - [Autenticação JWT](#autenticação-jwt)
 - [Middleware de autenticação](#middleware-de-autenticação)
+- [Update de usuário](#update-de-usuário)
+
 
 
 #### Migration de usuário
@@ -499,3 +501,68 @@ Quando a gente utiliza o routes.use ele só passa a funcionar nas rotas abaixo d
 Para testarmos conseguimos utilizar a [essa collection do insomnia](README_FILES/insomnia/GoBarber_Update.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](#cadastro-de-usuários)
 
 Colocarei o curl dessas chamadas na próxima parte pois também trabalharemos nessa chamada.
+
+#### Update de usuário
+
+Nesse módulo atualizamos o [controller de users na parte de update](src/app/controller/UserController.js) para que os dados corretos sejam passados na chamada e altere a partir do id do token.
+
+Para testarmos conseguimos utilizar a [essa collection do insomnia](README_FILES/insomnia/GoBarber_UpdateData.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](#cadastro-de-usuários)
+
+Um exemplo de sucesso é:
+
+**Request**:
+```
+curl --request PUT \
+  --url http://localhost:3333/users \
+  --header 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNTg1NjM1MDU0LCJleHAiOjE1ODYyMzk4NTR9.ljR-qC3R6AjOR2CwEIZppfJKzGgByHr0ARlAHk8MViw' \
+  --header 'content-type: application/json' \
+  --data '{
+	"name": "Lydia Jorge Rodrigues",
+	"email": "mlydiarodrigues7@gmail.com",
+	"oldPassword": "123123",
+	"password": "111111"
+}'
+```
+**Response**:
+```
+{
+  "id": 5,
+  "name": "Lydia Jorge Rodrigues",
+  "email": "mlydiarodrigues7@gmail.com",
+  "provider": false
+}
+```
+Um de erro com email já usado:
+
+**Request**:
+```
+{
+	"name": "Lydia Jorge Rodrigues",
+	"email": "emailjausado@gmail.com",
+	"oldPassword": "111111",
+	"password": "123123"
+}
+```
+**Response**:
+```
+{
+  "error": "Email already used"
+}
+```
+Um de erro com senha incorreta:
+
+**Request**:
+```
+{
+	"name": "Lydia Jorge Rodrigues",
+	"email": "mlydiarodrigues7@gmail.com",
+	"oldPassword": "senhaErrada",
+	"password": "111111"
+}
+```
+**Response**:
+```
+{
+  "error": "Password does not match"
+}
+```
