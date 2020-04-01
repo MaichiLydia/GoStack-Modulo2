@@ -227,6 +227,7 @@ instalar `yarn add pg pg-hstore` e adicionar as configurações em [database.js]
 - [Autenticação JWT](#autenticação-jwt)
 - [Middleware de autenticação](#middleware-de-autenticação)
 - [Update de usuário](#update-de-usuário)
+- [Validando dados de entrada](#validando-dados-de-entrada)
 
 
 
@@ -566,3 +567,51 @@ Um de erro com senha incorreta:
   "error": "Password does not match"
 }
 ```
+
+#### Validando dados de entrada
+
+Aqui validamos os dados de entrada do cliente, colocando campos obrigatórios e validando tipos, aqui utilizaremos o yup, um modo de schema validation:
+`yarn add yup`
+
+Utilizamos nas controllers de [sessão](app/controllers/SessionController.js) e de [usuarios](app/controllers/UserController.js)
+
+Com ele conseguimos definir os tipos que desejamos receber e validar se eles estão sendo enviados no body da requisição.
+
+Na parte da criação de usuários, colocamos os campos como obrigatórios com tipo string e também conseguimos colocar para validar formatação de email.
+```
+const schema = Yup.object().shape({
+    name: Yup.string().required(),
+    email: Yup.string().email().required(),
+    password: Yup.string().required().min(6),
+});
+if (!(await schema.isValid(req.body))) {
+    return res.status(400).json({ error: 'Validation failed' });
+}
+```
+
+Na parte do update é possível colocar obrigatoriedade condicional, baseado na existencia de algum outro campo e também verificar se o valor de um campo é igual a de outro.
+```
+const schema = Yup.object().shape({
+    name: Yup.string(),
+    email: Yup.string().email(),
+    oldPassword: Yup.string().min(6),
+    password: Yup.string()
+        .min(6)
+        .when('oldPassword', (oldPassword, field) => {
+            return oldPassword ? field.required() : field;
+        }),
+    confirmPassword: Yup.string().when(
+        'password',
+        (password, field) => {
+            return password
+                ? field.required().oneOf([Yup.ref('password')])
+                : field;
+        }
+    ),
+});
+if (!(await schema.isValid(req.body))) {
+    return res.status(400).json({ error: 'Validation failed' });
+}
+```
+
+Para testarmos conseguimos utilizar a [essa collection do insomnia](README_FILES/insomnia/GoBarber_Validation.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](#cadastro-de-usuários)
