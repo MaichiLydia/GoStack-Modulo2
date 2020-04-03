@@ -93,4 +93,4 @@ curl --request PUT \
 Consequimos atualizar o valor no banco:
 ![Imagem do registro com id 5 com o valor do avatar_id atualizado para 1](../README_FILES/images/postbird/update_avatar_id.png)
 
-[<- Aula anterior](Aula2.md)
+[<- Aula anterior](Aula2.md) | [Próxima aula ->](Aula4.md)

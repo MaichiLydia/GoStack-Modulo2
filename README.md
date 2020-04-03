@@ -21,7 +21,8 @@ Conceituais
 - [JWT](https://jwt.io/introduction/)
 
 #### Índice das aulas:
-- [Aula1 - Ambiente e conceitos](README_AULAS/Aula1.md)
-- [Aula2 - Cadastro e autenticação de usuários](README_AULAS/Aula2.md)
+- [Aula 1 - Ambiente e conceitos](README_AULAS/Aula1.md)
+- [Aula 2 - Cadastro e autenticação de usuários](README_AULAS/Aula2.md)
 - [Aula 3 - Envio de arquivos](README_AULAS/Aula3.md)
+- [Aula 4 - Funcionalidade de agendamentos](README_AULAS/Aula4.md)
 
