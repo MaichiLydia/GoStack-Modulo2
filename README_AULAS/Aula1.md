@@ -188,3 +188,6 @@ Após isso será necessário criar na raiz do projeto um arquivo `.sequelicerc` 
 instalar `yarn add pg pg-hstore` e adicionar as configurações em [database.js](../src/config/database.js), aqui ficaram as informações para conexão no postgres e as definições necessárias, como:
 - `timestamps` para adicionar `created_at` e `updated_at` nas tabelas e conseguirmos verificar datas de criação e edição.
 - `underscored` e `underscoredAll` para padronizar a nomenclatura para _ e não camelCase, exemplo: userGroups ficariaw user_groups
+
+
+[Próxima Aula ->](Aula2.md)
