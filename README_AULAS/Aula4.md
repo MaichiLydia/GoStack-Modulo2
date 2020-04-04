@@ -8,6 +8,7 @@
 - [Agendamento de serviço](#agendamento-de-serviço)
 - [Validações de agendamento](#validações-de-agendamento)
 - [Listando agendamentos do usuário](#listando-agendamentos-do-usuário)
+- [Aplicando paginação](#aplicando-paginação)
 
 
 #### Listagem de prestadores de serviço
@@ -182,5 +183,13 @@ Response:
 ```
 
 Conseguimos testar também utilizando [essa collection do insomnia de listagem de agendamento](../README_FILES/insomnia/GoBarber_Appointments.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](Aula2.md#cadastro-de-usuários)
+
+#### Aplicando paginação
+
+Aplicamos paginação para que caso o usuário tenha muitos agendamentos, não carregue todos de uma vez.
+Para isso alteramos na [controller de agendamento](../src/app/controllers/AppointmentController.js) utilizando o parametro query da requisição para falarmos em que "página" estamos.
+
+Conseguimos testar utilizando [essa collection do insomnia de listagem de agendamento](../README_FILES/insomnia/GoBarber_AppointmentsPagination.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](Aula2.md#cadastro-de-usuários)
+
 
 [<- Aula anterior](Aula3.md)
