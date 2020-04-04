@@ -6,7 +6,7 @@
 - [Listagem de prestadores de serviço](#listagem-de-prestadores-de-serviço)
 - [Migration e model de agendamento](#migration-e-model-de-agendamento)
 - [Agendamento de serviço](#agendamento-de-serviço)
-
+- [Validações de agendamento](#validações-de-agendamento)
 
 
 #### Listagem de prestadores de serviço
@@ -114,5 +114,36 @@ Conseguimos testar também utilizando [essa collection do insomnia de agendament
 
 E conseguimos ver o registro no postbird também:
 ![Nessa imagem tem o resgistro de agendamento no postbird com os seguintes valores id: 1, date: 2020-08-29 15:00:00+00, user_id:5, provider_id: 1, canceled_at: NULL, created_at: 2020-04-04 18:31:56.928+00, update_at: 2020-04-04 18:31:56.928+00](../README_FILES/images/postbird/create_appointment.png)
+
+#### Validações de agendamento
+
+Para que a gente consiga fazer as validações de data necessárias: se a data não é uma data do passado ou se o prestador de serviço já tem um agendamento nesse horário, utilizamos a biblioteca date-fns na versão atual(@next):
+```
+yarn add date-fns@next
+```
+E atualizamos a [controller de agendamento](../src/app/controllers/AppointmentController.js):
+```
+const hourStart = startOfHour(parseISO(date));
+```
+A parseISO transforma a string da data para um objeto date de javascript e o startOfHour vai pegar sempre o inicio da hora, zerando os valores de minutos.
+E aí fazemos a chegagem se a data escolhida é uma data passada:
+```
+if (isBefore(hourStart, new Date())) {
+    return res
+        .status(400)
+        .json({ error: 'Past dates are not allowed' });
+}
+```
+E a disponibilidade de horário do prestador de serviço escolhido:
+```
+const checkAvailability = await Appointment.findOne({
+    where: {
+        provider_id,
+        canceled_at: null,
+        date: hourStart,
+    },
+});
+```
+Conseguimos testar utilizando [essa collection do insomnia de agendamento de serviço](../README_FILES/insomnia/GoBarber_AppointmentValidation.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](Aula2.md#cadastro-de-usuários)
 
 [<- Aula anterior](Aula3.md)
