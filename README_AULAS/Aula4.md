@@ -9,6 +9,7 @@
 - [Validações de agendamento](#validações-de-agendamento)
 - [Listando agendamentos do usuário](#listando-agendamentos-do-usuário)
 - [Aplicando paginação](#aplicando-paginação)
+- [Listando agenda do prestador](#listando-agenda-do-prestador)
 
 
 #### Listagem de prestadores de serviço
@@ -190,6 +191,17 @@ Aplicamos paginação para que caso o usuário tenha muitos agendamentos, não c
 Para isso alteramos na [controller de agendamento](../src/app/controllers/AppointmentController.js) utilizando o parametro query da requisição para falarmos em que "página" estamos.
 
 Conseguimos testar utilizando [essa collection do insomnia de listagem de agendamento](../README_FILES/insomnia/GoBarber_AppointmentsPagination.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](Aula2.md#cadastro-de-usuários)
+
+
+#### Listando agenda do prestador
+Para listarmos a agenda do prestador de serviço, criamos a [controller de agenda](../src/app/controllers/ScheduleController.js) e criaremos a rota no [arquivo de rotas](../src/routes.js).
+
+Nessa requisição, utilizaremos o query param date, pois para o prestador será mais eficiente se ele souber os agendamentos por dia.
+
+Para testarmos, será necessário utilizarmos o token de um prestador de serviço, para isso a gente pode logar com um usuário que tenha `provider: true`, caso a senha não esteja como formato hash, é possível mudar no postbird, copiando o password_hash do usuário que utilizamos nas outras chamadas no password_hash do usuário que tenha `provider: true` e gerar o token utilizando a requisição de `/sessions`.
+
+Conseguimos testar utilizando [essa collection do insomnia da aula4](../README_FILES/insomnia/GoBarber_Aula4.json), utilizando a parte de Schedule, lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](Aula2.md#cadastro-de-usuários)
+
 
 
 [<- Aula anterior](Aula3.md)
