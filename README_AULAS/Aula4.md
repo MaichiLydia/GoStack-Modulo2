@@ -7,6 +7,7 @@
 - [Migration e model de agendamento](#migration-e-model-de-agendamento)
 - [Agendamento de serviço](#agendamento-de-serviço)
 - [Validações de agendamento](#validações-de-agendamento)
+- [Listando agendamentos do usuário](#listando-agendamentos-do-usuário)
 
 
 #### Listagem de prestadores de serviço
@@ -145,5 +146,41 @@ const checkAvailability = await Appointment.findOne({
 });
 ```
 Conseguimos testar utilizando [essa collection do insomnia de agendamento de serviço](../README_FILES/insomnia/GoBarber_AppointmentValidation.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](Aula2.md#cadastro-de-usuários)
+
+#### Listando agendamentos do usuário
+
+Para fazer essa listagem, criaremos o metodo index na [controller de agendamento](../src/app/controllers/AppointmentController.js) e criar uma nova rota no [arquivo de rotas](../src/routes.js)
+
+Requisição:
+```
+curl --request GET \
+  --url http://localhost:3333/appointments \
+  --header 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNTg1ODgzOTMxLCJleHAiOjE1ODY0ODg3MzF9.mYiP3Ij0lD_OUb1jeyczPHkrKIM25IEN56KVK2r5n6c'
+```
+Response:
+```
+[
+  {
+    "id": 1,
+    "date": "2020-08-29T15:00:00.000Z",
+    "canceled_at": null,
+    "createdAt": "2020-04-04T18:31:56.928Z",
+    "updatedAt": "2020-04-04T18:31:56.928Z",
+    "user_id": 5,
+    "provider_id": 1,
+    "provider": {
+      "id": 1,
+      "name": "Lydia Rodrigues",
+      "avatar": {
+        "url": "http://localhost:3333/files/85a95fb0d236a0dbdeec40755a27e22b.jpg",
+        "id": 1,
+        "path": "85a95fb0d236a0dbdeec40755a27e22b.jpg"
+      }
+    }
+  }
+]
+```
+
+Conseguimos testar também utilizando [essa collection do insomnia de listagem de agendamento](../README_FILES/insomnia/GoBarber_Appointments.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](Aula2.md#cadastro-de-usuários)
 
 [<- Aula anterior](Aula3.md)
