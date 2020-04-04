@@ -25,4 +25,5 @@ Conceituais
 - [Aula 2 - Cadastro e autenticação de usuários](README_AULAS/Aula2.md)
 - [Aula 3 - Envio de arquivos](README_AULAS/Aula3.md)
 - [Aula 4 - Funcionalidade de agendamentos](README_AULAS/Aula4.md)
+- [Aula 5 - Envio de notificações](README_AULAS/Aula5.md)
 
