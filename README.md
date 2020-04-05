@@ -14,6 +14,7 @@ Instação
 - [express getting started](https://expressjs.com/en/starter/installing.html) e [express reference](https://expressjs.com/en/4x/api.html)
 - [Docker get started](https://www.docker.com/get-started) e [Docker documentação](https://docs.docker.com/)
 - [Postbird](https://www.electronjs.org/apps/postbird)
+- [Mongo getting started e doc](https://mongoosejs.com/docs/index.html)
 
 Conceituais
 - [HTTP Métodos](https://www.w3schools.com/tags/ref_httpmethods.asp)
