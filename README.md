@@ -14,6 +14,9 @@ Instação
 - [express getting started](https://expressjs.com/en/starter/installing.html) e [express reference](https://expressjs.com/en/4x/api.html)
 - [Docker get started](https://www.docker.com/get-started) e [Docker documentação](https://docs.docker.com/)
 - [Postbird](https://www.electronjs.org/apps/postbird)
+- [Mongo](https://www.mongodb.com/)
+- [Mongoose getting started e doc](https://mongoosejs.com/docs/index.html)
+- [MongoDB Compass Documentação](https://docs.mongodb.com/compass/current/)
 
 Conceituais
 - [HTTP Métodos](https://www.w3schools.com/tags/ref_httpmethods.asp)
@@ -25,4 +28,5 @@ Conceituais
 - [Aula 2 - Cadastro e autenticação de usuários](README_AULAS/Aula2.md)
 - [Aula 3 - Envio de arquivos](README_AULAS/Aula3.md)
 - [Aula 4 - Funcionalidade de agendamentos](README_AULAS/Aula4.md)
+- [Aula 5 - Envio de notificações](README_AULAS/Aula5.md)
 
