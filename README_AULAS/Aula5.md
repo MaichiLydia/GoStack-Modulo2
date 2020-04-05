@@ -5,6 +5,7 @@
 #### Sumário
 - [Configurando MongoDB](#configurando-mongodb)
 - [Notificando novos agendamentos](#notificando-novos-agendamentos)
+- [Listando notificações do usuário](#listando-notificações-do-usuário)
 
 #### Configurando MongoDB
 Utilizaremos banco de dados não relacionais porque teremos dados na nossa aplicação que não serão estruturados e não terão relacionamentos e que precisarão ser performáticos
@@ -85,5 +86,39 @@ E aí após a criação de um nvoo agendamento, o database gobarber estará no m
 E o documento(registro) de notificação também:
 
 ![No mongodb compass aparece o documento de notificação basicamente em formato json com _id, read:false, content: "Novo agendamento de Lydia Jorge Rodrigues para dia 30 de agosto, às 12:00h", user: 1, createdAt: 2020-04-05T16:32:30.563+00:00, updatedAt: 2020-04-05T16:32:30.563+00:00](../README_FILES/images/mongo/notification.png)
+
+#### Listando notificações do usuário
+Começamos criando a rota no [arquivo de rotas](../src/routes.js) e depois a [controller de notificação](../src/app/controllers/NotificationController.js), aqui na parte de pegar os registros existentes, os métodos são diferentes do sequelize, para saber mais é possível checar na [documentação do mongoose](https://mongoosejs.com/docs/api.html), feito essas modificações é possível fazer a chamada:
+```
+curl --request GET \
+  --url http://localhost:3333/notifications \
+  --header 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNTg2MDMxMzg4LCJleHAiOjE1ODY2MzYxODh9.NGAhIq3JDaxXNgC1yBVqreu8M2KyhD2qacltgU-0O6E'
+```
+Response:
+```
+[
+  {
+    "read": false,
+    "_id": "5e8a102fb3d27c0516858e97",
+    "content": "Novo agendamento de Lydia Jorge Rodrigues para dia 24 de agosto, às 12:00h",
+    "user": 1,
+    "createdAt": "2020-04-05T17:06:55.553Z",
+    "updatedAt": "2020-04-05T17:06:55.553Z",
+    "__v": 0
+  },
+  {
+    "read": false,
+    "_id": "5e8a081e3956886e874a569e",
+    "content": "Novo agendamento de Lydia Jorge Rodrigues para dia 30 de agosto, às 12:00h",
+    "user": 1,
+    "createdAt": "2020-04-05T16:32:30.563Z",
+    "updatedAt": "2020-04-05T16:32:30.563Z",
+    "__v": 0
+  }
+]
+```
+Conseguimos testar utilizando também [essa collection do insomnia de listagem de notificações](../README_FILES/insomnia/GoBarber_Notifications.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](Aula2.md#cadastro-de-usuários)
+
+Nesse capítulo também modificamos a [controller de agendamento](../src/app/controllers/AppointmentController.js) para impedir que um usuário consiga marcar um agendamento com ele mesmo.
 
 [<- Aula anterior](Aula4.md)

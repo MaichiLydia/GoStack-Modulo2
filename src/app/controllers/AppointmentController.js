@@ -52,6 +52,12 @@ class AppointmentController {
                 error: 'You can only create appointments with providers ',
             });
         }
+        const checkIfSamePerson = provider_id === req.userId;
+        if (checkIfSamePerson) {
+            return res.status(400).json({
+                error: 'User and provider must be different',
+            });
+        }
 
         const hourStart = startOfHour(parseISO(date));
         if (isBefore(hourStart, new Date())) {
