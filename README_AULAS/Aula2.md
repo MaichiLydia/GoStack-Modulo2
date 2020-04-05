@@ -401,4 +401,4 @@ if (!(await schema.isValid(req.body))) {
 
 Para testarmos conseguimos utilizar a [essa collection do insomnia](../README_FILES/insomnia/GoBarber_Validation.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](#cadastro-de-usuários)
 
-[<- Aula anterior](Aula1.md) | [-> Próxima aula](Aula3.md)
+[<- Aula anterior](Aula1.md) | [Próxima aula ->](Aula3.md)
