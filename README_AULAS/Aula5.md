@@ -4,6 +4,7 @@
 
 #### Sumário
 - [Configurando MongoDB](#configurando-mongodb)
+- [Notificando novos agendamentos](#notificando-novos-agendamentos)
 
 #### Configurando MongoDB
 Utilizaremos banco de dados não relacionais porque teremos dados na nossa aplicação que não serão estruturados e não terão relacionamentos e que precisarão ser performáticos
@@ -33,7 +34,7 @@ Caso de algum erro com a conexão, é possível fzer a listagem dos containers e
 ```
 docker ps
 ```
-ou
+ou esse para listar todos os containers:
 ```
 docker ps -a
 ```
@@ -42,4 +43,47 @@ e para ver os logs:
 docker logs mongobarber
 ```
 utilizando o nome ou o id do container.
+
+#### Notificando novos agendamentos
+Aqui enviaremos uma notificação para o prestador de serviço toda vez que um novo agendamento ocorrer, e quem guardará essas notificações será o mongo, para isso criaremos um "schema", seriam como nossos models, mas no padrão de [schema tree](https://docs.mongodb.com/manual/applications/data-models-tree-structures/) e aqui não teremos as migrations, porém é necessário ter cuidado e estrategias para modificações.
+
+Começaremos criando uma pasta `schemas` dentro de `src/app` e o nosso [Schema de notificação](../src/app/schemas/Notification.js), depois de adicionar todo o código no nosso "model schema", também podemos notar uma diferença entre o mongo e o postgres,para o mongo não precisaremos criar a parte de load de models, apenas importamos e utilizamos onde é necessário, como vemos na [AppointmentControler](../src/app/controllers/AppointmentController.js), aqui não fazemos nenhum relacionamento, pois o que importa é o estado atual de cada modelo, não precisaremos atualizar essas partes caso alguma coisa nos registros de appointment ou usuário sejam modificadas.
+
+Assim como utilizamos o postbird para visualizar os dados do postgres, para o mongo utilizaremos o [mongodb compass](https://www.mongodb.com/download-center/compass), feito a conexão, já conseguimos visualizar:
+
+![Tela do mongoDB compass com as databases padrão: admin, config, local](../README_FILES/images/mongo/first_connection.png)
+Aqui percebemos que a nossa database gobarber ainda não existe, para isso precisaremos registrar um novo agendamento:
+
+Request:
+```
+curl --request POST \
+  --url http://localhost:3333/appointments \
+  --header 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNTg1ODgzOTMxLCJleHAiOjE1ODY0ODg3MzF9.mYiP3Ij0lD_OUb1jeyczPHkrKIM25IEN56KVK2r5n6c' \
+  --header 'content-type: application/json' \
+  --data '{
+	"provider_id": 1,
+	"date": "2020-08-30T12:00:00-03:00"
+}'
+```
+Response:
+```
+{
+  "id": 7,
+  "user_id": 5,
+  "provider_id": 1,
+  "date": "2020-08-30T15:00:00.000Z",
+  "updatedAt": "2020-04-05T16:32:30.532Z",
+  "createdAt": "2020-04-05T16:32:30.532Z",
+  "canceled_at": null
+}
+```
+
+E aí após a criação de um nvoo agendamento, o database gobarber estará no mongodb compass:
+
+![No mongodb compass aparecere, além das databases iniciais, a database gobarber criada após o registro de um novo agendamento](../README_FILES/images/mongo/database_gobarber.png)
+
+E o documento(registro) de notificação também:
+
+![No mongodb compass aparece o documento de notificação basicamente em formato json com _id, read:false, content: "Novo agendamento de Lydia Jorge Rodrigues para dia 30 de agosto, às 12:00h", user: 1, createdAt: 2020-04-05T16:32:30.563+00:00, updatedAt: 2020-04-05T16:32:30.563+00:00](../README_FILES/images/mongo/notification.png)
+
 [<- Aula anterior](Aula4.md)
