@@ -6,6 +6,7 @@
 - [Configurando MongoDB](#configurando-mongodb)
 - [Notificando novos agendamentos](#notificando-novos-agendamentos)
 - [Listando notificações do usuário](#listando-notificações-do-usuário)
+- [Marcar notificações como lidas](#marcar-notificações-como-lidas)
 
 #### Configurando MongoDB
 Utilizaremos banco de dados não relacionais porque teremos dados na nossa aplicação que não serão estruturados e não terão relacionamentos e que precisarão ser performáticos
@@ -120,5 +121,30 @@ Response:
 Conseguimos testar utilizando também [essa collection do insomnia de listagem de notificações](../README_FILES/insomnia/GoBarber_Notifications.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](Aula2.md#cadastro-de-usuários)
 
 Nesse capítulo também modificamos a [controller de agendamento](../src/app/controllers/AppointmentController.js) para impedir que um usuário consiga marcar um agendamento com ele mesmo.
+
+#### Marcar notificações como lidas
+Começamos criando a rota no [arquivo de rotas](../src/routes.js) e depois criar o método update na [controller de notificação](../src/app/controllers/NotificationController.js). Aqui utilizamos o método [findByIdAndUpdate](https://mongoosejs.com/docs/api.html#model_Model.findByIdAndUpdate), onde passamos o id que queremos achar e atualizar, a chave e valor do campo que será modificado, e o `{ new: true }` para que retorne o documento já com o valor atualizado, feito isso podemos fazer a requisição:
+
+```
+curl --request PUT \
+  --url http://localhost:3333/notifications/5e8a081e3956886e874a569e \
+  --header 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNTg2MDMxMzg4LCJleHAiOjE1ODY2MzYxODh9.NGAhIq3JDaxXNgC1yBVqreu8M2KyhD2qacltgU-0O6E'
+```
+Response:
+```
+{
+  "read": true,
+  "_id": "5e8a081e3956886e874a569e",
+  "content": "Novo agendamento de Lydia Jorge Rodrigues para dia 30 de agosto, às 12:00h",
+  "user": 1,
+  "createdAt": "2020-04-05T16:32:30.563Z",
+  "updatedAt": "2020-04-05T17:30:44.991Z",
+  "__v": 0
+}
+```
+
+Conseguimos testar utilizando [essa collection do insomnia da aula5](../README_FILES/insomnia/GoBarber_Aula5.json), utilizando a parte de PUT de Notifications, lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](Aula2.md#cadastro-de-usuários)
+
+
 
 [<- Aula anterior](Aula4.md)
