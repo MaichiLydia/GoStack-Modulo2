@@ -5,6 +5,7 @@
 #### Sumário
 - [Cancelamento de agendamento](#cancelamento-de-agendamento)
 - [Configurando Nodemailer](#configurando-nodemailer)
+- [Configurando template de e-mail](#configurando-template-de-e\-mail)
 
 #### Cancelamento de agendamento
 
@@ -67,7 +68,11 @@ A response levará um tempo a mais, pois estamos utilizando um serviço externo,
   "createdAt": "2020-04-05T16:32:30.532Z",
   "updatedAt": "2020-04-06T01:32:01.445Z",
   "user_id": 5,
-  "provider_id": 1
+  "provider_id": 1,
+  "provider": {
+    "name": "Lydia Rodrigues",
+    "email": "mlydiasilva10@gmail.com"
+  },
 }
 ```
 A checagem do envio do email é feito no mailtrap:
@@ -76,4 +81,74 @@ A checagem do envio do email é feito no mailtrap:
 
 Esse email nunca chegará a caixa do destinatário porque utilizamos o serviço gratuíto do mailtrap, quando chegarmos na parte de produção utilizaremos um serviço que enviará de verdade para o email, mas como estamos apenas testando desenvolvimento já conseguimos testar dessa forma sem custo.
 
+#### Configurando template de e-mail
+Para que a gente mande emails mais bonitos e personalizados, utilizaremos html e css, formando nossos próprios templates, para isso utilizaremos duas bibliotecas para conseguir chamar um template engine(arquivos html que aceitam variáveis do node), nesse projeto utilizaremos o Handlebars, para saber mais sobre [acesse a documentação](https://handlebarsjs.com/api-reference/):
+```
+yarn add express-handlebars nodemailer-express-handlebars
+```
+Criaremos dentro de `src/app` a pasta `views`, dentro dela a pasta `emails`, que terá o [arquivo de template de cancelamento](../src/app/views/emails/cancellation.hbs). e também as pastas `layouts`, que terá o [arquivo de padrão de layout](../src/app/views/emails/layouts/default.hbs) e `partials` vazia.
+
+A estrutura ficará assim:
+```
+src
+└───app
+│   └───views
+│   |   └───emails
+|   |   |   └───layouts
+│   │   |   |   └───default.hbs
+|   |   |   └───partials
+│   │   |   └───cancellation.hbs
+
+```
+E após isso importamos as dependencias de handlebars e configuraremos no [arquivo de libs de Email](../src/lib/Mail.js),
+Feito isso começaremos a dar cara para nosso email criando o html nos [arquivo de padrão de layout](../src/app/views/emails/layouts/default.hbs), [arquivo de template de cancelamento](../src/app/views/emails/cancellation.hbs), e criando um [arquivo de footer](../src/app/views/emails/partials/footer.hbs) na nossa pasta de `partials`.
+Com o término dos templates agora teremos que passar as variáveis e chamar o template correto na [controller de Agendamento](../src/app/controllers/AppointmentController.js).
+
+Conseguiremos testar fazendo a requisição do cancelamento de um agendamento:
+```
+curl --request DELETE \
+  --url http://localhost:3333/appointments/7 \
+  --header 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNTg1ODgzOTMxLCJleHAiOjE1ODY0ODg3MzF9.mYiP3Ij0lD_OUb1jeyczPHkrKIM25IEN56KVK2r5n6c'
+```
+A response levará um tempo a mais, pois estamos utilizando um serviço externo, mas logo mudaremos para que seja tão rápido como antes:
+```
+{
+  "id": 7,
+  "date": "2020-08-30T15:00:00.000Z",
+  "canceled_at": "2020-04-06T04:02:18.644Z",
+  "createdAt": "2020-04-05T16:32:30.532Z",
+  "updatedAt": "2020-04-06T04:02:18.645Z",
+  "user_id": 5,
+  "provider_id": 1,
+  "provider": {
+    "name": "Lydia Rodrigues",
+    "email": "mlydiasilva10@gmail.com"
+  },
+  "user": {
+    "id": 5,
+    "name": "Lydia Jorge Rodrigues",
+    "email": "mlydiasilva5@gmail.com",
+    "password_hash": "$2a$08$TchiFaAl.0atNKDOFxL2f.nDQE4q8QeQAohVwzq7z40J2cWRrgMWC",
+    "provider": false,
+    "createdAt": "2020-03-31T06:04:55.400Z",
+    "updatedAt": "2020-04-03T04:33:53.584Z",
+    "avatar_id": 1
+  }
+}
+```
+A checagem do envio do email é feito no mailtrap:
+![Captura de tela do email enviado na página do mailtrap, do lado esquerdo temos o email enviado com assunto: Agendamento cancelado, e destinatario: To:<mlydiasilva10@gmail.com> e a esquerda temos o template que configuramos juntos com todas as variáveis atualizadas com o prestador de serviço, usuário e data.](../README_FILES/images/response/mailtrap_template.png)
+
+```
+Olá Lydia Rodrigues
+Houve um cancelamento de horário, confira os detalhes abaixo:
+
+Cliente: Lydia Jorge Rodrigues
+Data/hora: dia 30 de agosto, às 12:00h
+
+O horário está novamente disponível para novos agendamentos.
+
+
+Equipe GoBarber
+```
 [<- Aula anterior](Aula5.md)
