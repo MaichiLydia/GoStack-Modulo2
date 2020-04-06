@@ -6,6 +6,7 @@
 - [Cancelamento de agendamento](#cancelamento-de-agendamento)
 - [Configurando Nodemailer](#configurando-nodemailer)
 - [Configurando template de e-mail](#configurando-template-de-e\-mail)
+- [Configurando fila com Redis](#configurando-fila-com-redis)
 
 #### Cancelamento de agendamento
 
@@ -151,4 +152,116 @@ O horário está novamente disponível para novos agendamentos.
 
 Equipe GoBarber
 ```
+
+#### Configurando fila com Redis
+Conseguimos diminuir o tempo de resposta de requisições que chamem serviços externos como essa de envio de email de duas formas:
+A forma mais rápida seria retirar o `await` da frente do envio do email no [arquivo da controller de agendamento](../src/app/controllers/AppointmentController.js):
+```
+await Mail.sendMail({
+    to: `${appointment.provider.name} <${appointment.provider.email}>`,
+    subject: 'Agendamento cancelado',
+    template: 'cancellation',
+    context: {
+        provider: appointment.provider.name,
+        user: appointment.user.name,
+        date: format(
+            appointment.date,
+            "'dia' dd 'de' MMMM', às' H:mm'h'",
+            {
+                locale: pt,
+            }
+        ),
+    },
+});
+```
+Isso faz com que a nossa resposta não dependa do sucesso do envio do email, porém a **desvantagem** disso é que caso ocorra um erro no envio de email nós não saberemos, pois a resposta já teria sido disparada para o cliente.
+
+A melhor forma para que a gente diminua esse tempo de resposta sem perder o controle, podendo até fazer retentativas em casos de erro, priorizar disparos e outras funcionalidades é utilizando `filas`(background jobs/trabalhos em segundo plano), para que a gente configure isso precisaremos de um banco chave: valor, e na nossa aplicação utilizaremos [Redis](https://redis.io/documentation), que também é não relacional, mas tem só trabalha com chave: valor, diferente do mongo que tem estrutura de dados e utiliza o schema, isso faz com que o Redis seja mais rápido e performático e funciona para o controle de erros que mencionamos.
+Iniciaremos criando nosso container:
+```
+sudo docker run --name redisbarber -p 6379:6379 -d -t redis:alpine
+```
+Utilizamos o `alpine` porque ele vem só com as funcionalidades essenciais do linux, ficando bem mais leve.
+
+Caso dê algum erro com a conexão, é possível fzer a listagem dos containers e ver os logs, como vimos na [Aula1](Aula1.md#configurando-docker):
+```
+docker ps
+```
+ou esse para listar todos os containers:
+```
+docker ps -a
+```
+e para ver os logs:
+```
+docker logs redisbarber
+```
+utilizando o nome ou o id do container.
+
+Feito isso criaremos um [arquivo de configuração para o redis](../src/config/redis.js) passando as informações de host e port para conexão.
+Obs: Aqui no meu eu usei a 6380, pois já estava usando a 6379 localmente.
+
+Após isso instalaremos o [bee-queue](https://github.com/bee-queue/bee-queue), ferramenta de fila para o nodejs, ele é muito performatico, porém não tem todas as funcionalidades que outras ferramentas de fila tem, como prioridade entre jobs, caso seja necessário utilizar essas funcionalidades também existe o [kue](https://github.com/Automattic/kue), menos performático, mas mais robusto, como não precisaremos, usaremos o bee-queue:
+```
+yarn add bee-queue
+```
+E criaremos [o arquivo para configurar a fila](../src/lib/Queue.js) na nossa pasta `lib` e também uma pasta `jobs` dentro de `src/app/` para armazenar todos os nossos jobs, já criando o [job de email de cancelamento](../src/app/jobs/CancellationMail.js), nessa parte retiraremos da [controller de agendamento](../src/app/controllers/AppointmentController.js) o envio de email e deixaremos o job responsável por isso.
+
+[O arquivo que configura as filas](../src/lib/Queue.js), tem o método `init` para inicializar as filas e o método `add` para adicionando itens nas filas e o `processQueue` para processar as filas.
+
+Como nos retiramos o envio da [controller de agendamento](../src/app/controllers/AppointmentController.js), agora devemos importar a fila e o job.
+```
+await Queue.add(CancellationMail.key, {
+    appointment,
+});
+```
+
+Para finalizar criaremos dentro de `src` um [arquivo queue.js](../src/queue.js), pois não executaremos a fila e a aplicação juntos, para que a fila nunca interfira na performace da nossa aplicação e que ambos sejam independentes.
+Para que seja possível utilizar o sucrase nele adicionaremos uma chamada na seção de scripts do [package.json](../package.json) e adicionamos `"queue": "nodemon src/queue.js"`.
+```
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "queue": "nodemon src/queue.js",
+    "dev:debug": "nodemon --inspect src/server.js",
+    "lint": "yarn eslint --fix src --ext .js"
+  },
+```
+
+Para testar deixaremos um
+```
+console.log('A fila executou');
+```
+no handle do [job de email de cancelamento](../src/app/jobs/CancellationMail.js), iniciamos num terminal a fila `yarn queue` e a aplicação em outro terminal `yarn dev` e fazemos novamente a requisição de cancelamento de agendamento:
+```
+curl --request DELETE \
+  --url http://localhost:3333/appointments/7 \
+  --header 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNTg1ODgzOTMxLCJleHAiOjE1ODY0ODg3MzF9.mYiP3Ij0lD_OUb1jeyczPHkrKIM25IEN56KVK2r5n6c'
+```
+A resposta dessa vez voltará a ser rápida:
+```
+{
+  "id": 7,
+  "date": "2020-08-30T15:00:00.000Z",
+  "canceled_at": "2020-04-06T05:16:43.953Z",
+  "createdAt": "2020-04-05T16:32:30.532Z",
+  "updatedAt": "2020-04-06T05:16:43.955Z",
+  "user_id": 5,
+  "provider_id": 1,
+  "provider": {
+    "name": "Lydia Rodrigues",
+    "email": "mlydiasilva5@gmail.com"
+  },
+  "user": {
+    "id": 5,
+    "name": "Lydia Jorge Rodrigues",
+    "email": "mlydiasilva10@gmail.com",
+    "password_hash": "$2a$08$TchiFaAl.0atNKDOFxL2f.nDQE4q8QeQAohVwzq7z40J2cWRrgMWC",
+    "provider": false,
+    "createdAt": "2020-03-31T06:04:55.400Z",
+    "updatedAt": "2020-04-03T04:33:53.584Z",
+    "avatar_id": 1
+  }
+}
+```
+E receberemos o email da mesma forma, e mesmo que ela demore algum tempinho, não tem problema, não prendemos a resposta do usuário e ainda temos controle sobre o `job` de envio de email :)
+
 [<- Aula anterior](Aula5.md)

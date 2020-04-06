@@ -17,6 +17,8 @@ Instação
 - [Mongo](https://www.mongodb.com/)
 - [Mongoose getting started e doc](https://mongoosejs.com/docs/index.html)
 - [MongoDB Compass Documentação](https://docs.mongodb.com/compass/current/)
+- [Download do Redis](https://redis.io/download) e [Documentação do Redis](https://redis.io/documentation)
+- [bee-queue](https://github.com/bee-queue/bee-queue)
 
 Conceituais
 - [HTTP Métodos](https://www.w3schools.com/tags/ref_httpmethods.asp)
