@@ -29,4 +29,5 @@ Conceituais
 - [Aula 3 - Envio de arquivos](README_AULAS/Aula3.md)
 - [Aula 4 - Funcionalidade de agendamentos](README_AULAS/Aula4.md)
 - [Aula 5 - Envio de notificações](README_AULAS/Aula5.md)
+- [Aula 6 - Cancelamento e envio de e-mail](README_AULAS/Aula6.md)
 
