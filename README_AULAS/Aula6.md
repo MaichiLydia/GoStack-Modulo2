@@ -7,6 +7,7 @@
 - [Configurando Nodemailer](#configurando-nodemailer)
 - [Configurando template de e-mail](#configurando-template-de-e\-mail)
 - [Configurando fila com Redis](#configurando-fila-com-redis)
+- [Monitorando falhas na fila](#monitorando-falhas-na-fila)
 
 #### Cancelamento de agendamento
 
@@ -263,5 +264,14 @@ A resposta dessa vez voltará a ser rápida:
 }
 ```
 E receberemos o email da mesma forma, e mesmo que ela demore algum tempinho, não tem problema, não prendemos a resposta do usuário e ainda temos controle sobre o `job` de envio de email :)
+
+#### Monitorando falhas na fila
+Para que a gente consiga captar os erros na fila, precisaremos mexer no [arquivo de configuração da fila](../src/lib/Queue.js), criaremos o método `handleFailure` e adicionamos `on('failed', this.handleFailure)` no método `processQueue`.
+Para testar mudaremos o nome o `Mail.sendMail` para `Mail.senddMail` no [job de email de cancelamento](../src/app/jobs/CancellationMail.js), ao fazer a requisição de cancelamento de agendamento conseguiremos ver nos logs do terminal:
+```
+Queue CancellationMail: FAILED TypeError: _Mail2.default.senddMail is not a function
+...
+```
+Por enquanto deixaremos no console.log, mas o ideal é que tenhamos esse erro num painel para visualização e melhor controle
 
 [<- Aula anterior](Aula5.md)
