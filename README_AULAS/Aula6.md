@@ -8,6 +8,7 @@
 - [Configurando template de e-mail](#configurando-template-de-e\-mail)
 - [Configurando fila com Redis](#configurando-fila-com-redis)
 - [Monitorando falhas na fila](#monitorando-falhas-na-fila)
+- [Listando horários disponíveis](#listando-horários-disponíveis)
 
 #### Cancelamento de agendamento
 
@@ -273,5 +274,128 @@ Queue CancellationMail: FAILED TypeError: _Mail2.default.senddMail is not a func
 ...
 ```
 Por enquanto deixaremos no console.log, mas o ideal é que tenhamos esse erro num painel para visualização e melhor controle
+
+#### Listando horários disponíveis
+
+As regras para nossa listagem são:
+- Listar por prestador
+- Não listar horários passados
+- Não listar horários que já tenham agendamento
+- Considerar horário comercial
+
+Começamos criando a rota no [arquivo de rotas](../src/routes.js) e criaremos a [controller de horários disponíveis](../src/app/controllers/AvailableController.js).
+
+Nós receberemos um query param `date` porém ele terá que ser no modelo timestamp(ex: `1586151529098`), pois o frontend terá um datepicker e timepicker e enviará os dados nesse formato, para saber qual é o atual podemos utilizar o console do navegador e digitar
+```
+new Date().getTime()
+```
+O meu resultado deu esse: 1586151529098, mas como é a data atual, vai variar com a data pedida, também é possível gerar uma data especifica passando o valor no Date().
+```
+new Date('2020 April 09').getTime()
+```
+Com isso conseguimos passar o query param no formato correto: `http://localhost:3333/providers/1/available?date=1586401200000`
+
+Com a const `appointments` conseguimos pegar todos os horários com agendamentos
+
+Com a `schedule` colocamos todos os horários que o prestador atende, nessa parte do código deixaremos com os horários listados nessa constante, mas podemos mais pra frente fazer uma atualização que pegue o horário que o prestador selecionar, já que nem todos os estabelecimentos funcionam no mesmo horário.
+
+```
+const available = schedule.map((time) => {
+    const [hour, minute] = time.split(':');
+    const value = setSeconds(
+        setMinutes(setHours(searchDate, hour), minute),
+        0
+    );
+
+    return {
+        time,
+        value: format(value, "yyyy-MM-dd'T'HH:mm:ssxxx"),
+        available:
+            isAfter(value, new Date()) &&
+            !appointments.find((a) => format(a.date, 'HH:mm') === time),
+    };
+});
+```
+
+Request:
+```
+curl --request GET \
+  --url 'http://localhost:3333/providers/1/available?date=1586401200000' \
+  --header 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNTg1ODgzOTMxLCJleHAiOjE1ODY0ODg3MzF9.mYiP3Ij0lD_OUb1jeyczPHkrKIM25IEN56KVK2r5n6c'
+```
+Response:
+```
+[
+  {
+    "time": "07:00",
+    "value": "2020-04-09T07:00:00-03:00",
+    "available": true
+  },
+  {
+    "time": "08:00",
+    "value": "2020-04-09T08:00:00-03:00",
+    "available": true
+  },
+  {
+    "time": "09:00",
+    "value": "2020-04-09T09:00:00-03:00",
+    "available": true
+  },
+  {
+    "time": "10:00",
+    "value": "2020-04-09T10:00:00-03:00",
+    "available": true
+  },
+  {
+    "time": "11:00",
+    "value": "2020-04-09T11:00:00-03:00",
+    "available": true
+  },
+  {
+    "time": "12:00",
+    "value": "2020-04-09T12:00:00-03:00",
+    "available": false
+  },
+  {
+    "time": "13:00",
+    "value": "2020-04-09T13:00:00-03:00",
+    "available": true
+  },
+  {
+    "time": "14:00",
+    "value": "2020-04-09T14:00:00-03:00",
+    "available": true
+  },
+  {
+    "time": "15:00",
+    "value": "2020-04-09T15:00:00-03:00",
+    "available": true
+  },
+  {
+    "time": "16:00",
+    "value": "2020-04-09T16:00:00-03:00",
+    "available": true
+  },
+  {
+    "time": "17:00",
+    "value": "2020-04-09T17:00:00-03:00",
+    "available": true
+  },
+  {
+    "time": "18:00",
+    "value": "2020-04-09T18:00:00-03:00",
+    "available": true
+  },
+  {
+    "time": "19:00",
+    "value": "2020-04-09T19:00:00-03:00",
+    "available": true
+  }
+]
+```
+
+
+Conseguimos testar também utilizando [essa collection do insomnia das datas disponíveis](../README_FILES/insomnia/GoBarber_Available.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](Aula2.md#cadastro-de-usuários)
+
 
 [<- Aula anterior](Aula5.md)
