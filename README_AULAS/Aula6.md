@@ -9,6 +9,7 @@
 - [Configurando fila com Redis](#configurando-fila-com-redis)
 - [Monitorando falhas na fila](#monitorando-falhas-na-fila)
 - [Listando horários disponíveis](#listando-horários-disponíveis)
+- [Campos virtuais no agendamento](#campos-virtuais-no-agendamento)
 
 #### Cancelamento de agendamento
 
@@ -298,6 +299,7 @@ Com isso conseguimos passar o query param no formato correto: `http://localhost:
 Com a const `appointments` conseguimos pegar todos os horários com agendamentos
 
 Com a `schedule` colocamos todos os horários que o prestador atende, nessa parte do código deixaremos com os horários listados nessa constante, mas podemos mais pra frente fazer uma atualização que pegue o horário que o prestador selecionar, já que nem todos os estabelecimentos funcionam no mesmo horário.
+E aqui retornamos todos os horários com a disponibilidade `true` ou `false` dependendo da agenda e se não é um horário que já passou.
 
 ```
 const available = schedule.map((time) => {
@@ -316,7 +318,6 @@ const available = schedule.map((time) => {
     };
 });
 ```
-
 Request:
 ```
 curl --request GET \
@@ -397,5 +398,10 @@ Response:
 
 Conseguimos testar também utilizando [essa collection do insomnia das datas disponíveis](../README_FILES/insomnia/GoBarber_Available.json), lembrando de seguir as configurações de ambiente do insomnia [citadas anteriormente](Aula2.md#cadastro-de-usuários)
 
+#### Campos virtuais no agendamento
+
+Aqui colocamos informações a mais para que o frontend consiga montar telas com agendamentos passados, para isso começamos mexendo na [model de agendamento](../src/app/models/Appointment.js) e criamos um campo `past` e um `cancellable` com tipo `VIRTUAL`, que como vimos antes, não existirá no banco, mas conseguimos retornar pelo backend. Depois disso atuaizamos a [controller de agendamento](../src/app/controllers/AppointmentController.js) para que no attributes ele também mostre o `past` e o `cancellable`
+
+Para testar é possível utilizar [a collection do insomnia da aula 6](../README_FILES/insomnia/GoBarber_Aula6.json), na parte de Listagem de agendamentos aqui estão todas as requisições da aplicação e atualizadas com essa aula.
 
 [<- Aula anterior](Aula5.md)
