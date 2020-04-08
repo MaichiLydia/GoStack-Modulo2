@@ -404,4 +404,4 @@ Aqui colocamos informações a mais para que o frontend consiga montar telas com
 
 Para testar é possível utilizar [a collection do insomnia da aula 6](../README_FILES/insomnia/GoBarber_Aula6.json), na parte de Listagem de agendamentos aqui estão todas as requisições da aplicação e atualizadas com essa aula.
 
-[<- Aula anterior](Aula5.md)
+[<- Aula anterior](Aula5.md) | [Próxima aula ->](Aula7.md)
