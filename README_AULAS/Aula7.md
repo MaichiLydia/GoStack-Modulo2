@@ -4,6 +4,7 @@
 
 #### Sumário
 - [Tratamento de exceções](#tratamento-de-exceções)
+- [Variáveis ambiente](#variáveis-ambiente)
 
 #### Tratamento de exceções
 Controlaremos e trataremos a parte de exceção, para isso utilizaremos o [sentry](https://sentry.io/), cadastraremos [nessa página](https://sentry.io/auth/login/) e após logado é necessário criar uma organização para seguir, para uso pessoal é possível utilizar o próprio nome ou qualquer outra coisa, para esse projeto utilizaremos `GoBarber`.
@@ -279,5 +280,16 @@ e a Response é bem rápida e detalhada:
 
 Aqui vimos como utilizar o [sentry](https://sentry.io) para monitorar os erros da nossa aplicação. Há muitas outras funcionalidades e integrações além dessas que utilizamos, [possível ler mais sobre na documentação do sentry](https://docs.sentry.io/), fazendo com que seja mais fácil ter métricas sobre o erro e como tratá-lo/corrigi-lo.
 
+
+#### Variáveis ambiente
+Aqui configuramos as variáveis de ambiente, que são variáveis que podem ter valores diferentes entre os ambientes de desenvolvimento, homologação e produção, para isso criamos o [arquivo de variáveis](../.env) e o adicionamos ao [.gitignore](../.gitignore) por conter informações confidenciais.
+
+Após adicionar as variavéis de ambiente utilizaremos dotenv:
+```
+yarn add dotenv
+```
+E importamos no [arquivo da app](../src/app.js) e no [arquivo da queue](../src/queue.js), pois executam separadamente, após isso substituimos todos os valores que estavam nos arquivos pelas variaveis de ambiente, e agora todos os dados confidenciais ficam num arquivo separado e não vão para o nosso repositório.
+
+Podemos criar um [env exemplo](../.env-example) que tenha as variaveis com os nomes, porém sem o valor, para que caso um novo desenvolvedor pegue a aplicação, saiba o que é necessário preencher, mas sem os acessos confidenciais
 
 [<- Aula anterior](Aula6.md)
